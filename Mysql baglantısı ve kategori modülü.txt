@@ -1,0 +1,82 @@
+ public Form2()
+        {
+            InitializeComponent();
+        }
+        MySqlConnection baglanti;
+
+        void kate_islem_listele()
+        {
+            string kayit = "SELECT kategori_id as Sıra,kategori_adi as Kategori from kategoriler";
+            MySqlCommand komut = new MySqlCommand(kayit, baglanti);
+            MySqlDataAdapter da = new MySqlDataAdapter(komut);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            kate_islem_grid.DataSource = dt;
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            MySqlConnectionStringBuilder build = new MySqlConnectionStringBuilder();
+            build.Server = "server_name";
+            build.UserID = "(generally'root')";
+            build.Database = database_name
+            build.Password = "database_password";
+            baglanti = new MySqlConnection(build.ToString());
+
+        private void kate_islem_ekle_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string komut = "insert into kategoriler(kategori_adi) values('" + kategori.Text + "')";
+            MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+            kmt.ExecuteNonQuery();
+
+            MessageBox.Show("Kategori Eklendi");
+            kate_islem_listele();
+            baglanti.Close();
+            kategori.Text = "";
+        }
+
+        private void kate_islem_sil_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            if (kate_islem_grid.Rows.Count == 0)
+            {
+                MessageBox.Show("Kayıt Bulunamadı");
+            }
+            else if (kate_islem_grid.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Seçim Yapınız");
+            }
+            else
+            {
+                string sql = "delete from kategoriler where kategori_id = '" + kate_islem_grid.CurrentRow.Cells[0].Value.ToString() + "' ";
+                MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+                silinecek.ExecuteNonQuery();
+                kate_islem_listele();
+            }
+            baglanti.Close();
+            kategori.Text = "";
+        }
+
+
+        private void kate_islem_guncel_Click(object sender, EventArgs e)
+        {
+            if (kategori.Text == "")
+            {
+                MessageBox.Show("Lütfen Değer Giriniz");
+            }
+            else
+            {
+                baglanti.Open();
+                string komut = "UPDATE kategoriler SET kategori_adi='" + kategori.Text + "' where kategori_id='" + kate_islem_grid.CurrentRow.Cells[0].Value.ToString() + "'";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+
+                MessageBox.Show("Kategori Bilgisi Güncellendi");
+                kate_islem_listele();
+                baglanti.Close();
+                kategori.Text = "";
+            }
+
+
+        }
