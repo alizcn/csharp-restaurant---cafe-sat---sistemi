@@ -4,6 +4,9 @@ Kullanılan araç ve teknolojiler;
 2) MYSQL(Xampp)
 3) Microsoft Visual Studio 2022(IDE)
 
+**Sistem yerel ortamda çalışacaktır.Ayrıca çalışanlar için el terminali istendiğinde ;
+-Web tabanlı (Php ile) sipariş alma sayfası oluşturulup bu sayfaya mobil uygulama ile bağlanılması sağlanacaktır.
+
 Modüller ve Özellikler
 
 --Personel Modülü-Firma çalışanlarının bilgileri ve yetki durumu.
