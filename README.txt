@@ -1,8 +1,8 @@
 Kullanılan araç ve teknolojiler;
 
-1.3 katmanlı mimaride C# programlama dili
-2.MYSQL(Xampp)
-3.Microsoft Visual Studio 2022(IDE)
+1) 3 katmanlı mimaride C# programlama dili
+2) MYSQL(Xampp)
+3) Microsoft Visual Studio 2022(IDE)
 
 Modüller ve Özellikler
 
