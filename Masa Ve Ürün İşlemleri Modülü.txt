@@ -1,0 +1,210 @@
+//masa işlemleri listele
+        void masa_islem_listele()
+        {
+            string kayit = "SELECT masa_id as Sıra,masa_adi as Masa from masa";
+            MySqlCommand komut = new MySqlCommand(kayit, baglanti);
+            MySqlDataAdapter da = new MySqlDataAdapter(komut);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            masa_islem_grid.DataSource = dt;
+        }
+
+        //urun işlemlerinde ürünleri listele
+        void urun_islem_urun_listele()
+        {
+            string getir = "SELECT urun_id as Ürün_No,kategori_id as Kategori_No,urun_adi as Ürün,fiyat as Fiyat from urunler";
+            MySqlCommand calis = new MySqlCommand(getir, baglanti);
+            MySqlDataAdapter tbl = new MySqlDataAdapter(calis);
+            DataTable urun_liste = new DataTable();
+            tbl.Fill(urun_liste);
+            urun_isl_urun_grid.DataSource = urun_liste;
+        }
+        //Ürün işlemlerinde kategori listele
+        void urun_islem_kate_listele()
+        {
+            string kayit = "SELECT kategori_id as Sıra,kategori_adi as Kategori from kategoriler";
+            MySqlCommand komut = new MySqlCommand(kayit, baglanti);
+            MySqlDataAdapter da = new MySqlDataAdapter(komut);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            urun_isl_kate_grid.DataSource = dt;
+        }
+
+   private void masa_islem_ekle_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string komut = "insert into masa(masa_adi) values('" + masa.Text + "')";
+            MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+            kmt.ExecuteNonQuery();
+
+            MessageBox.Show("Masa Eklendi");
+            masa_islem_listele();
+            baglanti.Close();
+            masa.Text = "";
+        }
+
+        private void masa_islem_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //masa.Text = masa_islem_grid.Rows[e.RowIndex].Cells[1].Value.ToString();
+            masa.Text = masa_islem_grid.CurrentRow.Cells[1].Value.ToString();
+        }
+
+        private void masa_islem_sil_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string sql = "delete from masa where masa_id = '" + masa_islem_grid.CurrentRow.Cells[0].Value.ToString() + "' ";
+            MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+            silinecek.ExecuteNonQuery();
+            masa_islem_listele();
+
+            string sifir_id = "ALTER TABLE masa DROP masa_id;ALTER TABLE masa ADD masa_id int not null auto_increment primary key first;";
+            MySqlCommand sifirla_id = new MySqlCommand(sifir_id, baglanti);
+            sifirla_id.ExecuteNonQuery();
+
+            baglanti.Close();
+            masa.Text = "";
+        }
+
+        private void masa_islem_guncel_Click(object sender, EventArgs e)
+        {
+            if (masa.Text == "")
+            {
+                MessageBox.Show("Lütfen Değer Giriniz");
+            }
+            else
+            {
+                baglanti.Open();
+                string komut = "UPDATE masa SET masa_adi='" + masa.Text + "' where masa_id='" + masa_islem_grid.CurrentRow.Cells[0].Value.ToString() + "'";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+
+                MessageBox.Show("Masa Bilgisi Güncellendi");
+                masa_islem_listele();
+                baglanti.Close();
+                masa.Text = "";
+            }
+        }
+private void urun_isl_kate_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //urun_isl_kategori.Text = urun_isl_kate_grid.Rows[e.RowIndex].Cells[0].Value.ToString();
+            urun_isl_kategori.Text = urun_isl_kate_grid.CurrentRow.Cells[0].Value.ToString();
+        }
+
+        private void urun_isl_urun_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            /*urun_isl_ad.Text = urun_isl_urun_grid.Rows[e.RowIndex].Cells[2].Value.ToString();
+            urun_isl_fiyat.Text = urun_isl_urun_grid.Rows[e.RowIndex].Cells[3].Value.ToString();
+            urun_isl_kategori.Text = urun_isl_urun_grid.Rows[e.RowIndex].Cells[1].Value.ToString();*/
+
+            urun_isl_ad.Text = urun_isl_urun_grid.CurrentRow.Cells[2].Value.ToString();
+            urun_isl_fiyat.Text= urun_isl_urun_grid.CurrentRow.Cells[3].Value.ToString();
+            urun_isl_kategori.Text= urun_isl_urun_grid.CurrentRow.Cells[1].Value.ToString();
+        }
+
+        private void urun_islem_ekle_Click(object sender, EventArgs e)
+        {
+            //virgüllü giriş
+
+
+
+            if (urun_isl_ad.Text == "" || urun_isl_fiyat.Text == "" || urun_isl_kategori.Text == "")
+            {
+                MessageBox.Show("Lütfen Alanları Doldurunuz");
+            }
+            else
+            {
+                baglanti.Open();
+                float num = float.Parse(urun_isl_fiyat.Text);
+                string urun_fiyat_float = num.ToString().Replace(',', '.');
+                string komut = "insert into urunler(kategori_id,urun_adi,fiyat) values('" + urun_isl_kategori.Text + "','" + urun_isl_ad.Text + "','" + urun_fiyat_float + "')";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+                MessageBox.Show("Ürün Eklendi");
+
+                urun_islem_kate_listele();
+                urun_islem_urun_listele();
+
+                baglanti.Close();
+
+                urun_isl_kategori.Text = "";
+                urun_isl_ad.Text = "";
+                urun_isl_fiyat.Text = "";
+
+
+
+            }
+        }
+
+        private void urun_islem_sil_Click(object sender, EventArgs e)
+        {
+
+            baglanti.Open();
+
+            if (urun_isl_urun_grid.Rows.Count == 0)
+            {
+                MessageBox.Show("Kayıt Bulunamadı");
+            }
+
+            else
+            {
+                string sql = "delete from urunler where urun_id = '" + urun_isl_urun_grid.CurrentRow.Cells[0].Value.ToString() + "' ";
+                MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+                silinecek.ExecuteNonQuery();
+
+
+                string sifir_id = "ALTER TABLE urunler DROP urun_id;ALTER TABLE urunler ADD urun_id int not null auto_increment primary key first;";
+                MySqlCommand sifirla_id = new MySqlCommand(sifir_id, baglanti);
+                sifirla_id.ExecuteNonQuery();
+
+                urun_islem_urun_listele();
+                urun_islem_kate_listele();
+            }
+            baglanti.Close();
+            urun_isl_kategori.Text = "";
+            urun_isl_ad.Text = "";
+            urun_isl_fiyat.Text = "";
+        }
+
+        private void urun_islem_guncel_Click(object sender, EventArgs e)
+        {
+            //virgüllü giriş
+
+
+            if (urun_isl_ad.Text == "" || urun_isl_fiyat.Text == "" || urun_isl_kategori.Text == "")
+            {
+                MessageBox.Show("Lütfen Değer Giriniz");
+            }
+            else
+            {
+                float num = float.Parse(urun_isl_fiyat.Text);
+                string urun_fiyat_float = num.ToString().Replace(',', '.');
+                baglanti.Open();
+                string komut = "UPDATE urunler SET kategori_id='" + urun_isl_kategori.Text + "',fiyat='" + urun_fiyat_float + "',urun_adi='" + urun_isl_ad.Text + "' where urun_id='" + urun_isl_urun_grid.CurrentRow.Cells[0].Value.ToString() + "'";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+                MessageBox.Show("Ürün Bilgileri Güncellendi");
+
+                urun_islem_urun_listele();
+                urun_islem_kate_listele();
+
+                baglanti.Close();
+                urun_isl_kategori.Text = "";
+                urun_isl_ad.Text = "";
+                urun_isl_fiyat.Text = "";
+                
+
+            }
+        }
+
+        private void urun_ara_tbx_TextChanged(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string getir = "SELECT urun_id as Ürün_No,kategori_id as Kategori_No,urun_adi as Ürün,fiyat as Fiyat  from urunler WHERE urun_adi LIKE '%" + urun_ara_tbx.Text + "%'";
+            MySqlCommand calis = new MySqlCommand(getir, baglanti);
+            MySqlDataAdapter tbl = new MySqlDataAdapter(calis);
+            DataTable urun_liste = new DataTable();
+            tbl.Fill(urun_liste);
+            urun_isl_urun_grid.DataSource = urun_liste;
+            baglanti.Close();
+        }
+
