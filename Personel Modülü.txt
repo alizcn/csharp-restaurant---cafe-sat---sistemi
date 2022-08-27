@@ -1,0 +1,117 @@
+ private void personel_ekle_Click(object sender, EventArgs e)
+        {
+            if (personel_tc.Text == "" || personel_ad.Text == "" || personel_soyad.Text == "" || personel_adres.Text == "" || personel_dog_tar.Text == "" || personel_cep_bir.Text == "" || personel_email.Text == "" || kullanici_adi.Text == "" || sifre.Text == "")
+            {
+                MessageBox.Show("Lütfen Alanları Doldurunuz");
+            }
+            else
+            {
+                baglanti.Open();
+                string komut = "insert into personel(personel_tc,personel_ad,personel_soyad,personel_adres,personel_dog_tar,personel_cep_bir,personel_cep_iki,personel_email,kullanici_adi,sifre,yetki) values('" + personel_tc.Text + "','" + personel_ad.Text + "','" + personel_soyad.Text + "','" + personel_adres.Text + "','" + personel_dog_tar.Text + "','" + personel_cep_bir.Text + "','" + personel_cep_iki.Text + "','" + personel_email.Text + "','" + kullanici_adi.Text + "','" + sifre.Text + "','" + yeki_cmb.Text + "')";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+                MessageBox.Show("Kayıt Eklendi");
+
+                personel_listele();
+
+
+                baglanti.Close();
+                personel_ad.Text = "";
+                personel_soyad.Text = "";
+                personel_email.Text = "";
+                personel_dog_tar.Text = "";
+                personel_cep_iki.Text = "";
+                personel_cep_bir.Text = "";
+                personel_adres.Text = "";
+                personel_tc.Text = "";
+                kullanici_adi.Text = "";
+                sifre.Text = "";
+            }
+        }
+
+        private void personel_guncelle_Click(object sender, EventArgs e)
+        {
+            if (personel_tc.Text == "" || personel_ad.Text == "" || personel_soyad.Text == "" || personel_adres.Text == "" || personel_dog_tar.Text == "" || personel_cep_bir.Text == "" || personel_email.Text == "" || kullanici_adi.Text == "" || sifre.Text == "")
+            {
+                MessageBox.Show("Lütfen Değer Giriniz");
+            }
+            else
+            {
+                baglanti.Open();
+                string komut = "UPDATE personel SET personel_tc='" + personel_tc.Text + "',personel_ad='" + personel_ad.Text + "',personel_soyad='" + personel_soyad.Text + "',personel_adres='" + personel_adres.Text + "',personel_dog_tar='" + personel_dog_tar.Text + "',personel_cep_bir='" + personel_cep_bir.Text + "',personel_cep_iki='" + personel_cep_iki.Text + "',personel_email='" + personel_email.Text + "',kullanici_adi='" + kullanici_adi.Text + "',sifre='" + sifre.Text + "',yetki='" + yeki_cmb.Text + "' where personel_id='" + personel_grid.CurrentRow.Cells[0].Value.ToString() + "'";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+                MessageBox.Show("Ürün Bilgileri Güncellendi");
+                personel_listele();
+
+                baglanti.Close();
+                personel_ad.Text = "";
+                personel_soyad.Text = "";
+                personel_email.Text = "";
+                personel_dog_tar.Text = "";
+                personel_cep_iki.Text = "";
+                personel_cep_bir.Text = "";
+                personel_adres.Text = "";
+                personel_tc.Text = "";
+                kullanici_adi.Text = "";
+                sifre.Text = "";
+
+            }
+        }
+
+        private void personel_sil_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+
+            if (personel_grid.Rows.Count == 0)
+            {
+                MessageBox.Show("Kayıt Bulunamadı");
+            }
+            else if (personel_grid.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Seçim Yapınız");
+            }
+            else
+            {
+                string sql = "delete from personel where personel_id = '" + personel_grid.CurrentRow.Cells[0].Value.ToString() + "' ";
+                MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+                silinecek.ExecuteNonQuery();
+
+                string sifir_id = "ALTER TABLE personel DROP personel_id;ALTER TABLE personel ADD personel_id int not null auto_increment primary key first;";
+                MySqlCommand sifirla_id = new MySqlCommand(sifir_id, baglanti);
+                sifirla_id.ExecuteNonQuery();
+
+
+                personel_listele();
+            }
+
+
+
+            baglanti.Close();
+        }
+
+        private void personel_ara_tbx_TextChanged(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string getir = "SELECT personel_id as Sıra,personel_tc as TCK_No,personel_ad as Ad,personel_soyad as Soyad,personel_adres as Adres,personel_dog_tar as Doğum_Tarihi,personel_cep_bir as Tel_1,personel_cep_iki as Tel_2,personel_email as E_Mail,kullanici_adi as Kullanıcı_Adı,sifre as Şifre,yetki as Yetki from personel WHERE personel_soyad LIKE '%" + personel_ara_tbx.Text + "%'";
+            MySqlCommand calis = new MySqlCommand(getir, baglanti);
+            MySqlDataAdapter tbl = new MySqlDataAdapter(calis);
+            DataTable urun_liste = new DataTable();
+            tbl.Fill(urun_liste);
+            personel_grid.DataSource = urun_liste;
+            baglanti.Close();
+        }
+
+        private void personel_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            personel_tc.Text = personel_grid.CurrentRow.Cells[1].Value.ToString();
+            personel_ad.Text = personel_grid.CurrentRow.Cells[2].Value.ToString();
+            personel_soyad.Text = personel_grid.CurrentRow.Cells[3].Value.ToString();
+            personel_adres.Text = personel_grid.CurrentRow.Cells[4].Value.ToString();
+            personel_dog_tar.Text = personel_grid.CurrentRow.Cells[5].Value.ToString();
+            personel_cep_bir.Text = personel_grid.CurrentRow.Cells[6].Value.ToString();
+            personel_cep_iki.Text = personel_grid.CurrentRow.Cells[7].Value.ToString();
+            personel_email.Text = personel_grid.CurrentRow.Cells[8].Value.ToString();
+            kullanici_adi.Text = personel_grid.CurrentRow.Cells[9].Value.ToString();
+            sifre.Text = personel_grid.CurrentRow.Cells[10].Value.ToString();
+        }
