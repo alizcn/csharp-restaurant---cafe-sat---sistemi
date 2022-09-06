@@ -1,0 +1,18 @@
+            baglanti.Open();
+            //*******MAC_ADRESSs********
+            string cek_mac = "select * from get_adress_mac";
+            MySqlCommand get_mac = new MySqlCommand(cek_mac, baglanti);
+            MySqlDataReader read_mac = get_mac.ExecuteReader();
+            string mac_adress;
+            while (read_mac.Read())
+            {
+                mac_adress=read_mac.GetString("get_adress_mac");
+                label28.Text= mac_adress;
+            }
+            string mac = Mac();;
+            if (String.IsNullOrEmpty(mac) || label28.Text != mac)
+            {
+                MessageBox.Show("...... YAZILIM © 2022 TÜM HAKLARI SAKLIDIR.");
+                Environment.Exit(0);
+            }
+  
