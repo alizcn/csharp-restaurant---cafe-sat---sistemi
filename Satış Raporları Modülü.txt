@@ -1,0 +1,178 @@
+  private void tum_satis_Click(object sender, EventArgs e)
+        {
+            string ilk_tarih=satislar_ilk_tarih.Value.ToString("yyyy-MM-dd");
+            string son_tarih=satislar_ikinci_tarih.Value.ToString("yyyy-MM-dd");
+            satis_bilg_grid.DataSource = null;
+            baglanti.Open();
+            string getir = "SELECT kayitlar_id as Sıra,kayitlar_personel as Personel,kayitlar_urun as Ürün,kayitlar_fiyat as Fiyat,kayitlar_adet as Adet,kayitlar_toplam as Toplam,kayitlar_tarih as Tarih,kayitlar_saat as Saat  from kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "'";
+            MySqlCommand calis = new MySqlCommand(getir, baglanti);
+            MySqlDataAdapter tbl = new MySqlDataAdapter(calis);
+            DataTable urun_liste = new DataTable();
+            tbl.Fill(urun_liste);
+            satis_bilg_grid.DataSource = urun_liste;
+            baglanti.Close();
+
+
+            baglanti.Open();
+            string satilan_adet = "SELECT SUM(kayitlar_adet),SUM(kayitlar_toplam),kayitlar_tarih as Tarih,kayitlar_saat as Saat from kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "'";
+            MySqlCommand cek_satilan_adet = new MySqlCommand(satilan_adet, baglanti);
+            MySqlDataReader read_satilan_adet = cek_satilan_adet.ExecuteReader();
+            string tum_satis_adet;
+            string tum_satis_toplm;
+            while (read_satilan_adet.Read())
+            {
+                try
+                {
+                    tum_satis_adet = read_satilan_adet.GetString("SUM(kayitlar_adet)");
+                    tum_satis_toplm = read_satilan_adet.GetString("SUM(kayitlar_toplam)");
+                    label34.Text = tum_satis_adet;
+                    label35.Text = tum_satis_toplm;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Tarihe Ait Satış Kaydı Yoktur");
+                    label34.Text = "";
+                    label35.Text = "";
+                }
+
+            }
+            baglanti.Close();
+        }
+
+        private void personel_satis_Click(object sender, EventArgs e)
+        {
+            string ilk_tarih = satislar_ilk_tarih.Value.ToString("yyyy-MM-dd");
+            string son_tarih = satislar_ikinci_tarih.Value.ToString("yyyy-MM-dd");
+
+            satis_bilg_grid.DataSource = null;
+            if (satislar_personel_cmb.Text == "PERSONEL SEÇ")
+            {
+                MessageBox.Show("Lütfen Personel Seçimi Yapınız");
+            }
+
+            else
+            { 
+            baglanti.Open();
+            string per_urun_satis = "SELECT kayitlar_personel as Personel, kayitlar_urun as Ürün,SUM(kayitlar_adet) as Satılan_Adet FROM kayitlar WHERE (kayitlar_personel='" + satislar_personel_cmb.Text + "') AND (kayitlar_tarih BETWEEN '" + ilk_tarih+ "' AND '" + son_tarih + "') GROUP BY kayitlar_urun,kayitlar_personel";
+            MySqlCommand per_urun_bazli = new MySqlCommand(per_urun_satis, baglanti);
+            MySqlDataAdapter per_urun_lst = new MySqlDataAdapter(per_urun_bazli);
+            DataTable per_ur_lst = new DataTable();
+            per_urun_lst.Fill(per_ur_lst);
+            satis_bilg_grid.DataSource = per_ur_lst;
+            baglanti.Close();
+
+
+            baglanti.Open();
+            string satilan_adet = "SELECT SUM(kayitlar_adet),SUM(kayitlar_toplam) from kayitlar WHERE (kayitlar_personel='" + satislar_personel_cmb.Text + "') AND (kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "')";
+            MySqlCommand cek_satilan_adet = new MySqlCommand(satilan_adet, baglanti);
+            MySqlDataReader read_satilan_adet = cek_satilan_adet.ExecuteReader();
+            string satis_per_adet;
+            string satis_per_toplm;
+            while (read_satilan_adet.Read())
+            {
+                try
+                {
+                        satis_per_adet = read_satilan_adet.GetString("SUM(kayitlar_adet)");
+                        satis_per_toplm = read_satilan_adet.GetString("SUM(kayitlar_toplam)");
+                        label34.Text = satis_per_adet;
+                        label35.Text = satis_per_toplm;
+                    }
+                catch(Exception)
+                {
+                        MessageBox.Show("Personele Ait Satış Kaydı Yoktur");
+                        label34.Text = "";
+                        label35.Text = "";
+                }
+            
+
+                
+            }
+            baglanti.Close();
+
+            }
+        }
+
+        private void tarih_urun_satis_Click(object sender, EventArgs e)
+        {
+            string ilk_tarih = satislar_ilk_tarih.Value.ToString("yyyy-MM-dd");
+            string son_tarih = satislar_ikinci_tarih.Value.ToString("yyyy-MM-dd");
+            satis_bilg_grid.DataSource = null;
+                baglanti.Open();
+                string per_urun_satis = "SELECT kayitlar_urun as Ürün,SUM(kayitlar_adet) as Satılan_Adet FROM kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "' GROUP BY kayitlar_urun";
+                MySqlCommand per_urun_bazli = new MySqlCommand(per_urun_satis, baglanti);
+                MySqlDataAdapter per_urun_lst = new MySqlDataAdapter(per_urun_bazli);
+                DataTable per_ur_lst = new DataTable();
+                per_urun_lst.Fill(per_ur_lst);
+                satis_bilg_grid.DataSource = per_ur_lst;
+                baglanti.Close();
+
+
+                baglanti.Open();
+                string satilan_adet = "SELECT SUM(kayitlar_adet),SUM(kayitlar_toplam) from kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "'";
+                MySqlCommand cek_satilan_adet = new MySqlCommand(satilan_adet, baglanti);
+                MySqlDataReader read_satilan_adet = cek_satilan_adet.ExecuteReader();
+                string satis_per_adet;
+                string satis_per_toplm;
+                while (read_satilan_adet.Read())
+                {
+                    try
+                    {
+                        satis_per_adet = read_satilan_adet.GetString("SUM(kayitlar_adet)");
+                        satis_per_toplm = read_satilan_adet.GetString("SUM(kayitlar_toplam)");
+                        label34.Text = satis_per_adet;
+                        label35.Text = satis_per_toplm;
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Tarihe Ait Satış Kaydı Yoktur");
+                        label34.Text = "";
+                        label35.Text = "";
+                    }
+
+
+
+                }
+                baglanti.Close();
+        }
+
+        private void gun_gun_satis_Click(object sender, EventArgs e)
+        {
+            string ilk_tarih = satislar_ilk_tarih.Value.ToString("yyyy-MM-dd");
+            string son_tarih = satislar_ikinci_tarih.Value.ToString("yyyy-MM-dd");
+            satis_bilg_grid.DataSource = null;
+            baglanti.Open();
+            string per_urun_satis = "SELECT SUM(kayitlar_adet) as Satılan_Adet,SUM(kayitlar_toplam) as Toplam,kayitlar_tarih as Tarih FROM kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih + "' GROUP BY kayitlar_tarih";
+            MySqlCommand per_urun_bazli = new MySqlCommand(per_urun_satis, baglanti);
+            MySqlDataAdapter per_urun_lst = new MySqlDataAdapter(per_urun_bazli);
+            DataTable per_ur_lst = new DataTable();
+            per_urun_lst.Fill(per_ur_lst);
+            satis_bilg_grid.DataSource = per_ur_lst;
+            baglanti.Close();
+
+            baglanti.Open();
+            string satilan_adet = "SELECT SUM(kayitlar_adet),SUM(kayitlar_toplam) from kayitlar WHERE kayitlar_tarih BETWEEN '" + ilk_tarih + "' AND '" + son_tarih  + "'";
+            MySqlCommand cek_satilan_adet = new MySqlCommand(satilan_adet, baglanti);
+            MySqlDataReader read_satilan_adet = cek_satilan_adet.ExecuteReader();
+            string satis_per_adet;
+            string satis_per_toplm;
+            while (read_satilan_adet.Read())
+            {
+                try
+                {
+                    satis_per_adet = read_satilan_adet.GetString("SUM(kayitlar_adet)");
+                    satis_per_toplm = read_satilan_adet.GetString("SUM(kayitlar_toplam)");
+                    label34.Text = satis_per_adet;
+                    label35.Text = satis_per_toplm;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Tarihe Ait Satış Kaydı Yoktur");
+                    label34.Text = "";
+                    label35.Text = "";
+                }
+
+
+
+            }
+            baglanti.Close();
+        }
