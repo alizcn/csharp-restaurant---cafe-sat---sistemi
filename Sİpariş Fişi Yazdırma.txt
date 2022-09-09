@@ -1,0 +1,54 @@
+
+****Satış sayfası-Sipariş Fişi Yazdırma****
+
+private void yazdir_Click(object sender, EventArgs e)
+        {
+            
+            
+            PrintDocument pd = new PrintDocument();
+            pd.PrintPage += new PrintPageEventHandler(printDocument1_PrintPage);
+            pd.Print();
+        }
+
+
+
+
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            DateTime bugun = DateTime.Now;
+            string anlik_tarih = bugun.ToString();
+            try
+            {
+                Font font = new Font("Arial", 7);
+                Font font1 = new Font("Calibri", 12);
+                Font font2 = new Font("Arial BLack", 7);
+                SolidBrush firca = new SolidBrush(Color.Black);
+                
+                e.Graphics.DrawString("Tarih   : " + bugun, font, firca, 0, 10);
+                e.Graphics.DrawString("MEŞHUR ADIYAMAN ÇİĞKÖFTECİSİ", font2, firca, 0, 35);
+                e.Graphics.DrawString("--------------------------------------------------------------------------", font, firca, 0, 50);
+                e.Graphics.DrawString("Ürün", font, firca, 0, 65);
+                e.Graphics.DrawString("Fiyat", font, firca, 70, 65);
+                e.Graphics.DrawString("Adet", font, firca, 115, 65);
+                e.Graphics.DrawString("Toplam", font, firca, 140, 65);
+
+                int y = 80;
+                for (int i = 0; i < satis_gecici_grid.Rows.Count  ; i++)
+                {
+                    e.Graphics.DrawString(satis_gecici_grid.Rows[i].Cells["Ürün"].Value.ToString(), font, firca, 0, y);
+                    e.Graphics.DrawString(satis_gecici_grid.Rows[i].Cells["Fiyat"].Value.ToString() + " TL", font, firca, 70, y);
+                    e.Graphics.DrawString("x" + satis_gecici_grid.Rows[i].Cells["Adet"].Value.ToString(), font, firca, 115, y);
+                    e.Graphics.DrawString(satis_gecici_grid.Rows[i].Cells["Toplam_Fiyat"].Value.ToString() + " TL", font, firca, 140, y);
+                    y = y + 15;
+                   
+                    e.Graphics.DrawString("--------------------------------------------------------------------------", font, firca, 0, y+5);
+                    e.Graphics.DrawString("TOPLAM : " + label13.Text, font1, firca, 0, y + 35);
+                    e.Graphics.DrawString("AFİYET OLSUN.İYİ GÜNLER", font1, firca, 0, y + 100);
+
+                }
+            }
+            catch
+            {
+
+            }
+        }
