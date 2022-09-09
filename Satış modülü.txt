@@ -1,0 +1,308 @@
+private void satis_urun_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            satis_urun_ad.Text = satis_urun_grid.CurrentRow.Cells[0].Value.ToString();
+            satis_urun_fiyat.Text = satis_urun_grid.CurrentRow.Cells[1].Value.ToString();
+            if (satis_urun_ad.Text == satis_urun_grid.CurrentRow.Cells[0].Value.ToString())
+            {
+                satis_urun_adet.Value = satis_urun_adet.Value + 1;
+            }
+            else
+            {
+                satis_urun_adet.Value = 0;
+                satis_urun_adet.Text = "0";
+            }
+        }
+
+        private void satis_kategori_grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            baglanti.Open();
+            int secili = satis_kategori_grid.SelectedCells[0].RowIndex;
+            string id = satis_kategori_grid.Rows[secili].Cells[0].Value.ToString();
+            string kayit = "SELECT urun_adi as Urun,fiyat as Fiyat from urunler where kategori_id=" + id;
+            MySqlCommand komut = new MySqlCommand(kayit, baglanti);
+            MySqlDataAdapter da = new MySqlDataAdapter(komut);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            satis_urun_grid.DataSource = dt;
+            baglanti.Close();
+        }
+
+        private void satis_ekle_Click(object sender, EventArgs e)
+        {
+            if (satis_urun_fiyat.Text != "" && satis_urun_adet.Text != "")
+            {
+                float fiyat_cek = float.Parse(satis_urun_fiyat.Text);
+                float adet_cek = float.Parse(satis_urun_adet.Text);
+                float hesapla = fiyat_cek * adet_cek;
+                satis_urun_toplam.Text = hesapla.ToString();
+
+            }
+            else
+            {
+                MessageBox.Show("Seçimleri Kontrol Ediniz");
+            }
+
+
+            float ur_fyt = float.Parse(satis_urun_fiyat.Text);
+            string urun_fiyat_float = ur_fyt.ToString().Replace(',', '.');
+
+            float ur_adet = float.Parse(satis_urun_adet.Text);
+            string urun_adet_float = ur_adet.ToString().Replace(',', '.');
+
+            float ur_toplam = float.Parse(satis_urun_toplam.Text);
+            string urun_toplam_float = ur_toplam.ToString().Replace(',', '.');
+
+
+            DateTime bugun = DateTime.Now;
+            string anlik_tarih = bugun.ToString("yyyy-MM-dd");
+            string anlik_saat = bugun.ToLongTimeString();
+            if (ur_toplam !=0 && ur_adet!=0 && ur_adet != 0 && satis_per_cmb.Text != "PERSONEL SEÇ" && satis_masa_cmb.Text != "MASA SEÇ")
+            {
+                baglanti.Open();
+
+                string komut = "insert into gecici_kayit(masa,personel,urun,fiyat,adet,toplam,tarih,saat) values('" + satis_masa_cmb.Text + "','" + satis_per_cmb.Text + "','" + satis_urun_ad.Text + "','" + urun_fiyat_float + "','" + urun_adet_float + "','" + urun_toplam_float + "','" + anlik_tarih + "','" + anlik_saat + "')";
+                MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                kmt.ExecuteNonQuery();
+                satis_urun_ad.Text = "";
+                satis_urun_adet.Text = "0";
+                satis_urun_fiyat.Text = "0";
+                satis_urun_toplam.Text = "0";
+
+                baglanti.Close();
+
+                baglanti.Open();
+                string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat  from gecici_kayit ";
+                MySqlCommand list = new MySqlCommand(kayit, baglanti);
+                MySqlDataAdapter da = new MySqlDataAdapter(list);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                satis_gecici_grid.DataSource = dt;
+                baglanti.Close();
+            }
+            else
+            {
+                MessageBox.Show("Seçimleri Kontrol Ediniz");
+            }
+
+        }
+        
+
+        private void satis_temizle_Click(object sender, EventArgs e)
+        {
+            satis_urun_ad.Text = "";
+            satis_urun_adet.Text ="0";
+            satis_urun_fiyat.Text = "0";
+            satis_urun_toplam.Text = "0";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+
+            if (satis_urun_fiyat.Text != "" && satis_urun_adet.Text != "")
+            {
+                float fiyat_cek = float.Parse(satis_urun_fiyat.Text);
+                float adet_cek = float.Parse(satis_urun_adet.Text);
+                float hesapla = fiyat_cek * adet_cek;
+                satis_urun_toplam.Text = hesapla.ToString();
+
+            }
+            else
+            {
+                MessageBox.Show("Seçimleri Kontrol Ediniz");
+            }
+
+
+        }
+
+        private void satis_masa_hesap_cmb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat  from gecici_kayit where masa='" + satis_masa_hesap_cmb.Text + "'";
+            MySqlCommand list = new MySqlCommand(kayit, baglanti);
+            MySqlDataAdapter da = new MySqlDataAdapter(list);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            satis_gecici_grid.DataSource = dt;
+            baglanti.Close();
+
+            hesap_toplami();
+
+
+        }
+
+-----------------------------------------------------------------------------------------------------------
+//Satış modülü sipariş yönetimi****
+
+
+
+  private void satis_tumsatislar_Click(object sender, EventArgs e)
+        {
+            
+                baglanti.Open();
+                string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat from gecici_kayit";
+                MySqlCommand list = new MySqlCommand(kayit, baglanti);
+                MySqlDataAdapter da = new MySqlDataAdapter(list);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                satis_gecici_grid.DataSource = dt;
+                baglanti.Close();
+
+                satis_masa_hesap_cmb.Text = "";
+                label13.Text = "";
+            /*
+            baglanti.Open();
+            string masa_hesap = "SELECT DISTINCT masa FROM gecici_kayit";
+            MySqlCommand hesap_getir = new MySqlCommand(masa_hesap, baglanti);
+            MySqlDataReader hesap_cek = hesap_getir.ExecuteReader();
+            while (hesap_cek.Read())
+            {
+                satis_masa_hesap_cmb.Items.Add(hesap_cek.GetString("masa"));
+
+            }
+            baglanti.Close();
+            for (int i = 1; i < 11; i++)
+            {
+                Button btn = new Button();
+                btn.Name = i.ToString();
+                btn.Text = i.ToString();
+                btn.Width = 80;
+                btn.Height = 50;
+                //this.Controls.Add(btn); //bu şekilde form'a ekleme yapılırsa tüm butonlar üst üste çıkacaktır
+                panel1.Controls.Add(btn); //oluşan butonlar üstüste binmez
+            }
+
+            */
+
+
+        }
+
+        private void satis_masa_kapat_Click(object sender, EventArgs e)
+        {
+
+            if (satis_masa_hesap_cmb.Text == "")
+            {
+                MessageBox.Show("Masa Seçimi Yapınız");
+            }
+            else if (satis_gecici_grid.Rows.Count==0)
+            {
+                MessageBox.Show("Kayıt Bulunamadı");
+            }
+            else
+            {
+                DateTime bugun = DateTime.Now;
+                string anlik_tarih = bugun.ToString("yyyy-MM-dd");
+                string anlik_saat = bugun.ToLongTimeString();
+
+                baglanti.Open();
+                string anlik_tar = "UPDATE gecici_kayit SET tarih='" + anlik_tarih + "',saat='" + anlik_saat + "' where masa='" + satis_masa_hesap_cmb.Text + "'";
+                MySqlCommand tarih_cek = new MySqlCommand(anlik_tar, baglanti);
+                tarih_cek.ExecuteNonQuery();
+
+                string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat from gecici_kayit where masa='" + satis_masa_hesap_cmb.Text + "'";
+                MySqlCommand list = new MySqlCommand(kayit, baglanti);
+                MySqlDataAdapter da = new MySqlDataAdapter(list);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                satis_gecici_grid.DataSource = dt;
+
+                baglanti.Close();
+
+                baglanti.Open();
+                for (int i = 0; i < satis_gecici_grid.Rows.Count; i++)
+                {
+                    string iki = satis_gecici_grid.Rows[i].Cells["Personel"].Value.ToString();
+                    string uc = satis_gecici_grid.Rows[i].Cells["Ürün"].Value.ToString();
+                    string dort = satis_gecici_grid.Rows[i].Cells["Fiyat"].Value.ToString();
+                    string bes = satis_gecici_grid.Rows[i].Cells["Adet"].Value.ToString();
+                    string alti = satis_gecici_grid.Rows[i].Cells["Toplam_Fiyat"].Value.ToString();
+                    string yedi = satis_gecici_grid.Rows[i].Cells["Tarih"].Value.ToString();
+                    string sekiz = satis_gecici_grid.Rows[i].Cells["Saat"].Value.ToString();
+
+                    float fiyat = float.Parse(dort);
+                    string fiyat_float = fiyat.ToString().Replace(',', '.');
+
+                    float adet = float.Parse(bes);
+                    string adet_float = adet.ToString().Replace(',', '.');
+
+                    float toplam = float.Parse(alti);
+                    string toplam_float = toplam.ToString().Replace(',', '.');
+
+
+                    string komut = "insert into kayitlar(kayitlar_personel,kayitlar_urun,kayitlar_fiyat,kayitlar_adet,kayitlar_toplam,kayitlar_tarih,kayitlar_saat) values('" + iki + "','" + uc + "','" + fiyat_float + "','" + adet_float + "','" + toplam_float + "','" + anlik_tarih + "','" + sekiz + "')";
+                    MySqlCommand kmt = new MySqlCommand(komut, baglanti);
+                    kmt.ExecuteNonQuery();
+                    
+
+
+
+                }
+                yazdir_Click(sender, e);    
+                MessageBox.Show("Masa Hesabı Alındı");
+                string sql = "delete from gecici_kayit where masa = '" + satis_masa_hesap_cmb.Text + "' ";
+                MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+                silinecek.ExecuteNonQuery();
+                
+
+                string sifir_id = "ALTER TABLE gecici_kayit DROP gecici_id;ALTER TABLE gecici_kayit ADD gecici_id int not null auto_increment primary key first;";
+                MySqlCommand sifirla_id = new MySqlCommand(sifir_id, baglanti);
+                sifirla_id.ExecuteNonQuery();
+
+
+
+
+                gecici_kayit_listele();
+                satis_masa_hesap_cmb.Text = "";
+                label13.Text = "0 TL";
+                baglanti.Close();
+
+            }
+
+            
+
+        }
+
+        private void satis_siparis_iptal_Click(object sender, EventArgs e)
+        {
+            baglanti.Open();
+            if (satis_gecici_grid.Rows.Count == 0)
+            {
+                MessageBox.Show("Kayıt Bulunamadı");
+            }
+            else
+            {
+
+
+                string sql = "delete from gecici_kayit where gecici_id = '" + satis_gecici_grid.CurrentRow.Cells[0].Value.ToString() + "' ";
+                MySqlCommand silinecek = new MySqlCommand(sql, baglanti);
+                silinecek.ExecuteNonQuery();
+
+                string sifir_id = "ALTER TABLE gecici_kayit DROP gecici_id;ALTER TABLE gecici_kayit ADD gecici_id int not null auto_increment primary key first;";
+                MySqlCommand sifirla_id = new MySqlCommand(sifir_id, baglanti);
+                sifirla_id.ExecuteNonQuery();
+                if(satis_masa_hesap_cmb.Text != "")
+                {
+                    string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat from gecici_kayit where masa='" + satis_masa_hesap_cmb.Text + "'";
+                    MySqlCommand list = new MySqlCommand(kayit, baglanti);
+                    MySqlDataAdapter da = new MySqlDataAdapter(list);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    satis_gecici_grid.DataSource = dt;
+                    hesap_toplami();
+                }
+                else
+                {
+                    string kayit = "SELECT gecici_id as Sıra,masa as Masa_No,personel as Personel,urun as Ürün,fiyat as Fiyat,adet as Adet,toplam as Toplam_Fiyat,tarih as Tarih,saat as Saat from gecici_kayit";
+                    MySqlCommand list = new MySqlCommand(kayit, baglanti);
+                    MySqlDataAdapter da = new MySqlDataAdapter(list);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    satis_gecici_grid.DataSource = dt;
+                }
+
+            }
+            
+            baglanti.Close();
+        }
+
+
