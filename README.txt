@@ -1,8 +1,7 @@
 Kullanılan araç ve teknolojiler;
 
-1) 3 katmanlı mimaride C# programlama dili
-2) MYSQL(Xampp)
-3) Microsoft Visual Studio 2022(IDE)
+1) MYSQL(Xampp)
+2)  Microsoft Visual Studio 2022(IDE)
 
 **Sistem yerel ortamda çalışacaktır.Ayrıca çalışanlar için el terminali istendiğinde ;
 -Web tabanlı (Php ile) sipariş alma sayfası oluşturulup bu sayfaya mobil uygulama ile bağlanılması sağlanacaktır.
